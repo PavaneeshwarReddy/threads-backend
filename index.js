@@ -1,23 +1,32 @@
 const express = require("express");
-
+const dotenv = require("dotenv");
 const app = express();
+const cors = require("cors")
+const cookieParser = require("cookie-parser")
 const { sequelize, connectToDb } = require("./database");
 const authRouter = require("./Routes/authRouter");
 const postRouter = require("./Routes/postRouter");
-app.use(express.json());
 
+
+//this has to be at the top always.
+dotenv.config();
+app.use(cookieParser())
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true,
+}));
+
+app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/post",postRouter);
 
-app.get("/", (request, response) => {
-  response.status(200).json({ messsage: "recieved received successfully" });
-});
 
 
 
-app.listen(5000, async () => {
+
+app.listen(5105, async () => {
   console.log("server started port:5000");
   await connectToDb();
   //this force will drop the existing tables if changes happen
-  sequelize.sync({force:true}).then(()=>console.log("sequelize successfull"));
+  sequelize.sync({force:false}).then(()=>console.log("sequelize successfull"));
 });
